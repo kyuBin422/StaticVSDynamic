@@ -1,13 +1,15 @@
-function f=valueInformation(theta0,q)
-gamma=0.01;
-R=exp(0.05);
-F=5;
-kappa=100;
-s0=0.01;
-b=0.5;
-G=-0.5;
-c=0.01;
-ex=staticUtilityStar(theta0,q);
+function f=valueInformation(theta0,q,s0,gamma,kappa,c,F,R,G,b)
+
+% gamma=0.01;
+% R=exp(0.05);
+% F=5;
+% kappa=100;
+% s0=0.01;
+% b=0.5;
+% G=-0.5;
+% c=0.01;
+
+ex=staticUtilityStar(theta0,q,s0,gamma,kappa,c,F,R,G,b);
 if theta0>-G/b
     f=ex+exp(-gamma*kappa*R-(b*theta0+G)^2/(2*b^2*s0));
 elseif theta0==-G/b

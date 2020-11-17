@@ -10,7 +10,7 @@ G=-0.5;
 c=0.01;
 sq=s0./(1+q*s0);
 
-f=-exp(-gamma*((G+b*thetaq).*omegaStar(thetaq,q)+R*(kappa-F-c*q))+gamma^2*b^2*omegaStar(thetaq,q).^2.*sq/2);
+f=-exp(-gamma*((G+b*thetaq).*omegaStar(thetaq,q,gamma,s0,b,G)+R*(kappa-F-c*q))+gamma^2*b^2*omegaStar(thetaq,q,gamma,s0,b,G).^2.*sq/2);
 f=mean(f);
  
 % paper lemma4

@@ -1,9 +1,9 @@
-function solution=solveFirstOrder(theta0)
+function solution=solveFirstOrder(theta0,s0,gamma,kappa,c,F,R,G,b)
 % the range of q
 solution=0.01:0.01:6000;
 % work out the value information and v'(q)
-fVBar=vDerivative(theta0,solution);
-fV=valueInformation(theta0,solution);
+fVBar=vDerivative(theta0,solution,s0,gamma,kappa,c,F,R,G,b);
+fV=valueInformation(theta0,solution,s0,gamma,kappa,c,F,R,G,b);
 
 fV(fV<=0)=0;
 % find the optimal q
