@@ -1,23 +1,24 @@
-function dynamicUtility = HMsimPnL(X0,p)
+function result = HMsimPnL(X0,p,OutputBool,s0,gamma,kappa,c,F,R,G,b)
 addpath(genpath('utils'));
 % X0 is the  intial belief
 % p = 1, plot the stopping boundaries, else plot only Expected pnl
 
-s0 = 0.01;
-gamma = 0.01;
-kappa = 100;
-c = 0.01;
-F = 5;
-R = exp(0.05);
-G = -0.5;
-b = 0.5;
+% s0 = 0.01;
+% gamma = 0.01;
+% kappa = 100;
+% c = 0.01;
+% F = 5;
+% R = exp(0.05);
+% G = -0.5;
+% b = 0.5;
+
 T = s0; 
 % initial q and thetaq
 qList=[];
 thetaqList=[];
 
 
-rounds = 10000;
+rounds = 1000;
 
 X = 1; %this has to correspond to the paramenters in HMdynamicFD
 [~, ~,M]=HMdynamicFD(X, s0, gamma, kappa, c, F, R, G, b);
@@ -108,7 +109,17 @@ if p == 1
 else
     close(4)
 end
-dynamicUtility=dynamicUtilityStar(thetaqList,qList);
+result=[];
+dynamicExpectedUtility=dynamicUtilityStar(thetaqList,qList);
+dynamicExpectedQ=mean(qList);
+switch OutputBool
+    case 0
+        result=thetaqList;
+    case 1
+        result=qList;
+    case 2
+        result=[thetaqList;qList];
+end
 % save('matlab_x0=1point3.mat','qList','thetaqList')
 end
 
