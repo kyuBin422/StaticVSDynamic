@@ -12,30 +12,26 @@ addpath(genpath('utils'));
 % G = -0.5;
 % b = 0.5;
 
-T = s0; 
-% initial q and thetaq
-qList=[];
-thetaqList=[];
+T = s0;
 
 
-rounds = 1000;
+rounds = 10000;
 
 X = 1; %this has to correspond to the paramenters in HMdynamicFD
 [~, ~,M]=HMdynamicFD(X, s0, gamma, kappa, c, F, R, G, b);
 
-
+% initial q and thetaq
+qList=zeros(rounds,1);
+thetaqList=zeros(rounds,1);
+% check the condition output figure or not
 if p == 1
     hold on
 else
     close(1)
 end
 
-%initialzie pnl
-exp_PNL = zeros(1,100);
-exp_PNL2 = zeros(1,100);
 
-
-for i = 1:rounds
+parfor i = 1:rounds
     
     % create brownian motion with drift = 0, volatility 1
     obj = bm(0,1);
@@ -73,54 +69,33 @@ for i = 1:rounds
     thetaq = X1(stopping_indx);
     tau = T1(stopping_indx);
     q = tau/(s0^2 - s0*tau);
-    qList(end+1)=q;
-    thetaqList(end+1)=thetaq;
-    
-%     % discretize Shock 1 for plotting
-%     S1 = linspace(0.6,1.05,100);
-%     S2 = linspace(1,4,100);
-%     
-%     for j = 1:100
-%         exp_PNL(j) = exp_PNL(j) + S1pnl(S1(j),q,thetaq,s0,gamma,kappa,c,F,R,G,b);
-%         exp_PNL2(j) = exp_PNL2(j) + S2pnl(S2(j),q,thetaq,s0,gamma,kappa,c,F,R,G,b,X0);
-%     end
+    qList(i)=q;
+    thetaqList(i)=thetaq;
     
 end
 
-% exp_PNL = exp_PNL/rounds;
-% exp_PNL2 = exp_PNL2/rounds;
-% 
-% figure (2)
-% plot(S1, exp_PNL)
-% %plot(S1, exp_PNL, '--')
-% 
-% figure (3)
-% plot(S2, exp_PNL2)
-% %plot(S2, exp_PNL2, '--')
+% meet the value information must be more than one
 
-figure (4)
-scatter(qList,thetaqList)
-xlabel('$q$','Interpreter','latex');
-ylabel('$\hat{\theta}_q$','Interpreter','latex');
-% ultity function
+qList(fullInformation(X0,s0,gamma,F,R,G,b)>=0)=0;
+qList(dynamicUtilityStar(thetaqList,qList,s0,gamma,kappa,c,F,R,G,b)<=0)=0;
+
 
 if p == 1
-    hold on
-else
-    close(4)
+    figure (4)
+    scatter(qList,thetaqList)
+    xlabel('$q$','Interpreter','latex');
+    ylabel('$\hat{\theta}_q$','Interpreter','latex');
 end
 result=[];
-dynamicExpectedUtility=dynamicUtilityStar(thetaqList,qList);
-dynamicExpectedQ=mean(qList);
 switch OutputBool
     case 0
         result=thetaqList;
     case 1
         result=qList;
     case 2
-        result=[thetaqList;qList];
+        result=[thetaqList,qList];
 end
-% save('matlab_x0=1point3.mat','qList','thetaqList')
+save('matlab_x0=1point3.mat','qList','thetaqList')
 end
 
 

@@ -7,14 +7,13 @@ addpath(genpath('FlexDist'));
 %%
 % marginal probility density funcion
 % optima q distrbution
-% [TrainMetric,TestMetric]=generatePDF(qList);
-% title('q* pdf','Interpreter','latex')
-% xlabel('$q$','Interpreter','latex');
+[TrainMetric,TestMetric]=generatePDF(qList)
+title('q* pdf','Interpreter','latex')
+xlabel('$q$','Interpreter','latex');
 
 % optima hat_theta_q distrbution
-conditionalThetaList=thetaqList(qList>500 &qList<510);
-generatePDF(thetaqList)
-title('\hat{\theta}_q pdf q>500&q<510')
+[TrainMetric,TestMetric]=generatePDF(thetaqList)
+title('$\hat{\theta}_q$','Interpreter','latex')
 xlabel('$\hat{\theta}_q$','Interpreter','latex');
 
 
@@ -25,15 +24,22 @@ jointDistrubution(thetaqList.',qList.')
 % f=generalizedHyperbolicDistrbution(x,lambda,chi,psi,mu,sigma,gamma);
 % [parmhat, se, parmci, output]=ghfit(thetaqList);
 % GHFit(thetaqList)
-[parmhat, se, parmci, output]=ghfit(thetaqList);
-y = ghpdf(sort(thetaqList),parmhat);
+
+x0=[-0.5547,1.0373,0.9583,0.5,0.5,0.5];
+
+options = optimset('Display','iter','PlotFcns',@optimplotfval);
+params=fminsearch(@(x) GHLike(thetaqList,x),x0,options);
+
+y=generalizedHyperbolicDistrbution(0.5:0.001:2,params(1),params(2),params(3),params(4),params(5),params(6));
+figure;
 histogram(thetaqList,'Normalization','pdf')
-line(sort(thetaqList),y,'LineStyle','-','Color','r')
+line(0.5:0.001:2,y,'LineStyle','-','Color','r')
 %%
 param=gradientDecent(thetaqList);
 y = generalizedHyperbolicDistrbution(sort(thetaqList),param.lambda,param.chi,param.psi,param.mu,param.sigma,param.gamma);
 histogram(thetaqList,'Normalization','pdf')
 line(sort(thetaqList),y,'LineStyle','-','Color','r')
+%%
 function [TrainMetric,TestMetric]=generatePDF(data)
 %split the set as train set and test set
 
@@ -201,27 +207,27 @@ param=struct('lambda',x0(1),'chi',x0(2),'psi',x0(3),'mu',x0(4),'sigma',x0(5),'ga
 while true
     StartValue=GHLikelihood(x0);
     [x1,result]=gradient(GHLikelihood,x0,'lambda');
-    param.lambda=param.lambda+leaningRate*result;
+    param.lambda=param.lambda-leaningRate*result;
     x0=x1;
     
     [x1,result]=gradient(GHLikelihood,x0,'chi');
-    param.chi=param.chi+leaningRate*result;
+    param.chi=param.chi-leaningRate*result;
     x0=x1;
     
     [x1,result]=gradient(GHLikelihood,x0,'psi');
-    param.psi=param.psi+leaningRate*result;
+    param.psi=param.psi-leaningRate*result;
     x0=x1;
     
     [x1,result]=gradient(GHLikelihood,x0,'mu');
-    param.mu=param.mu+leaningRate*result;
+    param.mu=param.mu-leaningRate*result;
     x0=x1;
     
     [x1,result]=gradient(GHLikelihood,x0,'sigma');
-    param.sigma=param.sigma+leaningRate*result;
+    param.sigma=param.sigma-leaningRate*result;
     x0=x1;
     
     [x1,result]=gradient(GHLikelihood,x0,'gamma');
-    param.gamma=param.gamma+leaningRate*result;
+    param.gamma=param.gammaleaningRate*result;
     x0=x1;
     EndValue=GHLikelihood(x0);
     param
@@ -256,5 +262,37 @@ switch flag
 end
 end
 
+function LogL = GHLike(x,Params)
 
+lambda=Params(1);
+chi=Params(2);
+psi=Params(3);
+mu=Params(4);
+sigma=Params(5);
+gamma=Params(6);
+
+if lambda >0
+    chi(chi<0)=0;
+    psi(chi<=0)=1e-11;
+elseif lambda ==0
+    chi(chi<=0)=1e-11;
+    psi(psi<=0)=1e-11;
+elseif lambda <0
+    chi(chi<=0)=1e-11;
+    psi(psi<0)=1e-11;
+end
+a= -lambda/2.*log(chi.*psi)+lambda.*log(psi)+(1/2-lambda).*log(psi+(gamma.^2./sigma.^2))-...
+    1/2*log(2*pi)-log(sigma)-log(besselk(lambda,sqrt(psi.*chi)));
+
+% compute the generalized hyperbolic distrbution
+LogL=a+log(besselk(lambda-0.5,sqrt((chi+(x-mu).^2./sigma^.2)...
+    .*(psi+gamma.^2./sigma.^2))))+gamma.*(x-mu)./sigma.^2 ...
+    +(lambda./2-1/4)*(log(chi+(x-mu).^2./sigma.^2)+log(psi+gamma.^2./sigma.^2));
+
+LogL=-sum(LogL)/length(x);
+
+LogL(~isfinite(LogL))  =  1.0e-20;
+LogL(~(~imag(LogL)))   =  1.0e-20;
+
+end
 

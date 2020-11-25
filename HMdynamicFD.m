@@ -130,6 +130,6 @@ end
 %exercise value function
 function value = g(X,s0,gamma,kappa,c,F,R,G,b,tau)
 
-value =  -exp( - ( (max(G + b*X,0))^2 )/(2*(s0-tau)*b^2) - gamma *( kappa- F - c*tau/(s0^2-s0*tau) )*(R)  );
+value =  -exp( - ( (max(G + b*X,0))^2 )/(2*(s0-tau)*b^2) - gamma *( kappa- F - c*tau/(s0^2-s0*tau) )*(R));
 
 end
