@@ -6,7 +6,6 @@ addpath(genpath('utils'));
 euStatic=[];
 euDynamic=[];
 
-
 % initla value
 s0 = 0.01;
 gamma = 0.01;
@@ -18,11 +17,9 @@ G = -0.5;
 b = 0.5;
 theta0=0.6:0.01:1.5;
 
-
 for i=theta0
     i
     % static
-    disp(i)
     optimalQ=solveFirstOrder(i,s0,gamma,kappa,c,F,R,G,b);
     euStatic(end+1)=staticUtilityStar(i,optimalQ,s0,gamma,kappa,c,F,R,G,b);
     
@@ -30,17 +27,18 @@ for i=theta0
     result=HMsimPnL(i,0,2,s0,gamma,kappa,c,F,R,G,b);
     thetaqList=result(:,1);
     qList=result(:,2);
-    euDynamic(end+1)=dynamicUtilityStar(thetaqList,qList,gamma,kappa,c,F,R,G,b);
+    euDynamic(end+1)=dynamicUtilityStar(thetaqList,qList,s0,gamma,kappa,c,F,R,G,b);
     
 end
 
 figure(1);
-plot(theta0,euStatic)
+plot(theta0,euStatic,'--')
 hold on
-plot(theta0,euDynamic)
-xlabel("theta0")
-ylabel("expected utility")
-legend("static","dynamic")
+plot(theta0,euDynamic,'-.')
+set(gcf,'Position',[100 100 700 550])
+xlabel("theta0",'FontSize',12,'FontWeight','bold')
+ylabel("Expected Utility",'FontSize',12,'FontWeight','bold')
+legend("static","dynamic",'FontSize',12)
 %%
 % ration of information cost when theta0=1.15 and theta0=0.95
 % initial parameter value
@@ -94,25 +92,25 @@ for i=gamma
 end
 figure;
 subplot(211)
-plot(gamma,StaticRation_theta115)
+plot(gamma,StaticRation_theta115,'--')
 hold on
-plot(gamma,DynamicRation_theta115)
-xlabel('\gamma','FontWeight','bold','FontSize',16)
-ylabel('cE(q^*)+F/E(\omega^*(q^*))','FontWeight','bold','FontSize',16)
-title('$\hat{\theta}_0=1.15>-G/b$','Interpreter','latex','FontWeight','bold','FontSize',16)
-legend("static","dynamic",'FontSize',13)
+plot(gamma,DynamicRation_theta115,'-.')
+xlabel('\gamma','FontWeight','bold','FontSize',12)
+ylabel('cE(q^*)+F/E(\omega^*(q^*))','FontWeight','bold','FontSize',12)
+title('$\hat{\theta}_0=1.15>-G/b$','Interpreter','latex','FontWeight','bold','FontSize',12)
+legend("static","dynamic",'FontSize',12)
 
 subplot(212)
-plot(gamma,StaticRation_theta095)
+plot(gamma,StaticRation_theta095,'--')
 hold on
-plot(gamma,DynamicRation_theta095)
-xlabel('\gamma','FontWeight','bold','FontSize',16)
-ylabel('cE(q^*)+F/E(\omega^*(q^*))','FontWeight','bold','FontSize',16)
-title('$\hat{\theta}_0=0.95<-G/b$','Interpreter','latex','FontWeight','bold','FontSize',16)
-legend("static","dynamic",'FontSize',13)
+plot(gamma,DynamicRation_theta095,'-.')
+xlabel('\gamma','FontWeight','bold','FontSize',12)
+ylabel('cE(q^*)+F/E(\omega^*(q^*))','FontWeight','bold','FontSize',12)
+title('$\hat{\theta}_0=0.95<-G/b$','Interpreter','latex','FontWeight','bold','FontSize',12)
+legend("static","dynamic",'FontSize',12)
 %%
 % s0 with repsect to the optimal q and exptect w
-s0 = 0.001:0.0001:0.01;
+s0 = 0.001:0.00005:0.01;
 gamma=0.01;
 kappa = 100;
 c = 0.01;
@@ -146,41 +144,41 @@ for i =s0
 end
 figure;
 subplot(211)
-plot(s0,StaticQ_theta115)
+plot(s0,StaticQ_theta115,'--')
 hold on
-plot(s0,DynamicQ_theta115)
-xlabel('s0','FontWeight','bold','FontSize',16)
-ylabel('E(q^*)','FontWeight','bold','FontSize',16)
-title('$\hat{\theta}_0=1.15>-G/b$','Interpreter','latex','FontWeight','bold','FontSize',16)
-legend("static","dynamic",'FontSize',13)
+plot(s0,DynamicQ_theta115,'-.')
+xlabel('s0','FontWeight','bold','FontSize',12)
+ylabel('E(q^*)','FontWeight','bold','FontSize',12)
+title('$\hat{\theta}_0=1.15>-G/b$','Interpreter','latex','FontWeight','bold','FontSize',12)
+legend("static","dynamic",'FontSize',12)
 
 subplot(212)
-plot(s0,StaticQ_theta095)
+plot(s0,StaticQ_theta095,'--')
 hold on
-plot(s0,DynamicQ_theta095)
-xlabel('s0','FontWeight','bold','FontSize',16)
-ylabel('E(q^*)','FontWeight','bold','FontSize',16)
-title('$\hat{\theta}_0=0.95<-G/b$','Interpreter','latex','FontWeight','bold','FontSize',16)
-legend("static","dynamic",'FontSize',13)
+plot(s0,DynamicQ_theta095,'-.')
+xlabel('s0','FontWeight','bold','FontSize',12)
+ylabel('E(q^*)','FontWeight','bold','FontSize',12)
+title('$\hat{\theta}_0=0.95<-G/b$','Interpreter','latex','FontWeight','bold','FontSize',12)
+legend("static","dynamic",'FontSize',12)
 
 figure;
 subplot(211)
-plot(s0,StaticW_theta115)
+plot(s0,StaticW_theta115,'--')
 hold on
-plot(s0,DynamicW_theta115)
-xlabel('s0','FontWeight','bold','FontSize',16)
-ylabel('E(\omega^*(q^*))','FontWeight','bold','FontSize',16)
-title('$\hat{\theta}_0=1.15>-G/b$','Interpreter','latex','FontWeight','bold','FontSize',16)
-legend("static","dynamic",'FontSize',13)
+plot(s0,DynamicW_theta115,'-.')
+xlabel('s0','FontWeight','bold','FontSize',12)
+ylabel('E(\omega^*(q^*))','FontWeight','bold','FontSize',12)
+title('$\hat{\theta}_0=1.15>-G/b$','Interpreter','latex','FontWeight','bold','FontSize',12)
+legend("static","dynamic",'FontSize',12)
 
 subplot(212)
-plot(s0,StaticW_theta095)
+plot(s0,StaticW_theta095,'--')
 hold on
-plot(s0,DynamicW_theta095)
-xlabel('s0','FontWeight','bold','FontSize',16)
-ylabel('E(\omega^*(q^*))','FontWeight','bold','FontSize',16)
-title('$\hat{\theta}_0=0.95<-G/b$','Interpreter','latex','FontWeight','bold','FontSize',16)
-legend("static","dynamic",'FontSize',13)
+plot(s0,DynamicW_theta095,'-.')
+xlabel('s0','FontWeight','bold','FontSize',12)
+ylabel('E(\omega^*(q^*))','FontWeight','bold','FontSize',12)
+title('$\hat{\theta}_0=0.95<-G/b$','Interpreter','latex','FontWeight','bold','FontSize',12)
+legend("static","dynamic",'FontSize',12)
 
 %%
 % gamma with repsect to the optimal q and exptect w
@@ -218,41 +216,41 @@ for i =gamma
 end
 figure;
 subplot(211)
-plot(gamma,StaticQ_theta115)
+plot(gamma,StaticQ_theta115,'--')
 hold on
-plot(gamma,DynamicQ_theta115)
-xlabel('\gamma','FontWeight','bold','FontSize',16)
-ylabel('E(q^*)','FontWeight','bold','FontSize',16)
-title('$\hat{\theta}_0=1.15>-G/b$','Interpreter','latex','FontWeight','bold','FontSize',16)
-legend("static","dynamic",'FontSize',13)
+plot(gamma,DynamicQ_theta115,'-.')
+xlabel('\gamma','FontWeight','bold','FontSize',12)
+ylabel('E(q^*)','FontWeight','bold','FontSize',12)
+title('$\hat{\theta}_0=1.15>-G/b$','Interpreter','latex','FontWeight','bold','FontSize',12)
+legend("static","dynamic",'FontSize',12)
 
 subplot(212)
-plot(gamma,StaticQ_theta095)
+plot(gamma,StaticQ_theta095,'--')
 hold on
-plot(gamma,DynamicQ_theta095)
-xlabel('\gamma','FontWeight','bold','FontSize',16)
-ylabel('E(q^*)','FontWeight','bold','FontSize',16)
-title('$\hat{\theta}_0=0.95<-G/b$','Interpreter','latex','FontWeight','bold','FontSize',16)
-legend("static","dynamic",'FontSize',13)
+plot(gamma,DynamicQ_theta095,'-.')
+xlabel('\gamma','FontWeight','bold','FontSize',12)
+ylabel('E(q^*)','FontWeight','bold','FontSize',12)
+title('$\hat{\theta}_0=0.95<-G/b$','Interpreter','latex','FontWeight','bold','FontSize',12)
+legend("static","dynamic",'FontSize',12)
 
 figure;
 subplot(211)
-plot(gamma,StaticW_theta115)
+plot(gamma,StaticW_theta115,'--')
 hold on
-plot(gamma,DynamicW_theta115)
-xlabel('\gamma','FontWeight','bold','FontSize',16)
-ylabel('E(\omega^*(q^*))','FontWeight','bold','FontSize',16)
-title('$\hat{\theta}_0=1.15>-G/b$','Interpreter','latex','FontWeight','bold','FontSize',16)
-legend("static","dynamic",'FontSize',13)
+plot(gamma,DynamicW_theta115,'-.')
+xlabel('\gamma','FontWeight','bold','FontSize',12)
+ylabel('E(\omega^*(q^*))','FontWeight','bold','FontSize',12)
+title('$\hat{\theta}_0=1.15>-G/b$','Interpreter','latex','FontWeight','bold','FontSize',12)
+legend("static","dynamic",'FontSize',12)
 
 subplot(212)
-plot(gamma,StaticW_theta095)
+plot(gamma,StaticW_theta095,'--')
 hold on
-plot(gamma,DynamicW_theta095)
-xlabel('\gamma','FontWeight','bold','FontSize',16)
-ylabel('E(\omega^*(q^*))','FontWeight','bold','FontSize',16)
-title('$\hat{\theta}_0=0.95<-G/b$','Interpreter','latex','FontWeight','bold','FontSize',16)
-legend("static","dynamic",'FontSize',13)
+plot(gamma,DynamicW_theta095,'-.')
+xlabel('\gamma','FontWeight','bold','FontSize',12)
+ylabel('E(\omega^*(q^*))','FontWeight','bold','FontSize',12)
+title('$\hat{\theta}_0=0.95<-G/b$','Interpreter','latex','FontWeight','bold','FontSize',12)
+legend("static","dynamic",'FontSize',12)
 
 %%
 function [StaticQ,StaticW,DynamicQ,DynamicW]=ComputeStaticVSDynamic(theta0,s0,gamma,kappa,c,F,R,G,b)

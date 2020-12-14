@@ -1,5 +1,6 @@
 function result = HMsimPnL(X0,p,OutputBool,s0,gamma,kappa,c,F,R,G,b)
 addpath(genpath('utils'));
+close(figure(1));close(figure(2))
 % X0 is the  intial belief
 % p = 1, plot the stopping boundaries, else plot only Expected pnl
 
@@ -64,6 +65,8 @@ parfor i = 1:rounds
     if p == 1
         plot(T1plot(1:stopping_indx), X1plot(1:stopping_indx));
     end
+    %     test1(i)=T1plot(stopping_indx);
+    %         test2(i)=X1plot(stopping_indx);
     
     % get actual T = q and X = theta_q values from the stopping_indx
     thetaq = X1(stopping_indx);
@@ -75,16 +78,19 @@ parfor i = 1:rounds
 end
 
 % meet the value information must be more than one
-
-qList(fullInformation(X0,s0,gamma,F,R,G,b)>=0)=0;
-qList(dynamicUtilityStar(thetaqList,qList,s0,gamma,kappa,c,F,R,G,b)<=0)=0;
+% and delete the outlier
+DeleteFlag= fullInformation(X0,s0,gamma,F,R,G,b)>=0 | dynamicUtilityStar(thetaqList,qList,s0,gamma,kappa,c,F,R,G,b)<0;
+thetaqList(DeleteFlag)=[];
+qList(DeleteFlag)=[];
 
 
 if p == 1
-    figure (4)
+    title("X0="+string(X0)+" "+"E(q)="+mean(qList)+" "+"$E(\hat{\theta}_q)=$"+mean(thetaqList),'Interpreter','latex','FontSize',12,'FontWeight','bold')
+    figure (2)
     scatter(qList,thetaqList)
-    xlabel('$q$','Interpreter','latex');
-    ylabel('$\hat{\theta}_q$','Interpreter','latex');
+    xlabel('$q$','Interpreter','latex','FontSize',12,'FontWeight','bold');
+    ylabel('$\hat{\theta}_q$','Interpreter','latex','FontSize',12,'FontWeight','bold');
+    title("X0="+string(X0)+" "+"E(q)="+mean(qList)+" "+"$E(\hat{\theta}_q)=$"+mean(thetaqList),'Interpreter','latex','FontSize',12,'FontWeight','bold')
 end
 result=[];
 switch OutputBool
@@ -95,35 +101,6 @@ switch OutputBool
     case 2
         result=[thetaqList,qList];
 end
-save('matlab_x0=1point3.mat','qList','thetaqList')
-end
-
-
-
-
-
-function PNL = S1pnl(S1,q,X,s0,gamma,kappa,c,F,R,G,b)
-
-w = max( (G + b*X)/( gamma*(b^2)*( s0/(1+s0*q) ) ),0 );
-
-if q <= 0
-    F = 0;
-end
-
-PNL = (G + b*S1)* w + (kappa- c*q - F  )*(R)-kappa;
-
-end
-
-
-function PNL = S2pnl(S2,q,X,s0,gamma,kappa,c,F,R,G,b,theta0)
-
-w = max( (G + b*X)/( gamma*(b^2)*( s0/(1+s0*q) ) ),0 );
-
-if q <= 0
-    F = 0;
-end
-
-PNL = (G + b*(theta0 - S2* sqrt(s0/(1+s0*q) ) ) )* w + (kappa- c*q - F  )*(R)-kappa;
-
+save('matlab_x0=1point3.mat','qList','thetaqList','-v6')
 end
 
