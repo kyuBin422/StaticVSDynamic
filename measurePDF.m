@@ -39,25 +39,6 @@ legend('TrainSet','TestSet')
 % joint distrbution
 jointDistrubution(thetaqList.',qList.')
 %%
-% f=generalizedHyperbolicDistrbution(x,lambda,chi,psi,mu,sigma,gamma);
-% [parmhat, se, parmci, output]=ghfit(thetaqList);
-% GHFit(thetaqList)
-
-x0=[10,10];
-
-% options = optimoptions(@fmincon,'Algorithm','sqp-legacy','Display','iter','PlotFcns',@optimplotfval);
-
-options = optimset('Display','iter','PlotFcns',@optimplotfval);
-params=fminsearch(@(x) NormalLike(thetaqList,x),x0,options);
-
-x=linspace(min(thetaqList),max(thetaqList),length(thetaqList));
-y=PDF(x,params);
-figure;
-[counts,centers] = hist(thetaqList,100);
-bar(centers,counts/trapz(centers,counts))
-hold on
-plot(x,y,'LineStyle','-','Color','r')
-%%
 % x0=[0.05,1.374,0.9583,1,1,0.3451];
 x0=[0.05,1.374,0.9583,1,1,0.3451];
 A=[];
@@ -149,38 +130,6 @@ TestMetric=struct(...
     );
 end
 
-function validationMLE(data)
-% divergence
-flag=randsample(length(data),fix(length(data)*0.8));
-trainX=data(flag);
-data(flag)=[];
-testX=data;
-
-% empirical distribution function
-meanEmpirical=mean(trainX);
-varianceEmpirical=var(trainX);
-
-% P true distrbution of data
-% Q theory model
-
-[Wei,Gamma,Lognormal,Normal]=generatePDF(trainX);
-
-[counts,centers]=hist(testX,20);
-
-PProbability=counts./length(testX);
-histBinWidth=(max(testX)-min(testX))/20;
-
-for QDistrbution=[Wei,Gamma,Lognormal,Normal]
-    QProbability=cdf(QDistrbution,centers+histBinWidth/2)-cdf(QDistrbution,centers-histBinWidth/2);
-    DKL_P_Q=sum(PProbability.*log(PProbability./QProbability));
-    DKL_Q_P=sum(QProbability.*log(QProbability./PProbability));
-    disp("divergence KL(P|Q) ="+ DKL_P_Q)
-    disp("divergence KL(Q|K) ="+ DKL_Q_P)
-    
-end
-
-end
-
 function jointDistrubution(theta,q)
 figure;
 scatterhist(q,theta,'Kernel','overlay')
@@ -226,72 +175,6 @@ ylabel('$\hat{\theta}_q$','Interpreter','latex','FontSize',12,'FontWeight','bold
 % set(get(gca,'children'),'marker','.')
 end
 
-
-
-function param=gradientDecent(data)
-GHLikelihood=@ (x) abs(sum(log(generalizedHyperbolicDistrbution(data,x(1),x(2),x(3),x(4),x(5),x(6)))));
-leaningRate=1e-3;
-x0=[-0.5547,1.0373,0.9583,mean(data),std(data),skewness(data)];
-param=struct('lambda',x0(1),'chi',x0(2),'psi',x0(3),'mu',x0(4),'sigma',x0(5),'gamma',x0(6));
-
-while true
-    StartValue=GHLikelihood(x0);
-    [x1,result]=gradient(GHLikelihood,x0,'lambda');
-    param.lambda=param.lambda-leaningRate*result;
-    x0=x1;
-    
-    [x1,result]=gradient(GHLikelihood,x0,'chi');
-    param.chi=param.chi-leaningRate*result;
-    x0=x1;
-    
-    [x1,result]=gradient(GHLikelihood,x0,'psi');
-    param.psi=param.psi-leaningRate*result;
-    x0=x1;
-    
-    [x1,result]=gradient(GHLikelihood,x0,'mu');
-    param.mu=param.mu-leaningRate*result;
-    x0=x1;
-    
-    [x1,result]=gradient(GHLikelihood,x0,'sigma');
-    param.sigma=param.sigma-leaningRate*result;
-    x0=x1;
-    
-    [x1,result]=gradient(GHLikelihood,x0,'gamma');
-    param.gamma=param.gammaleaningRate*result;
-    x0=x1;
-    EndValue=GHLikelihood(x0);
-    param
-    if (EndValue-StartValue)<1e-5
-        break
-    end
-end
-end
-
-function [x1,result]=gradient(Likelihood,x0, flag)
-result=0;
-x1=x0;
-switch flag
-    case 'lambda'
-        x1(1)=x0(1)+1e-4;
-        result=(Likelihood(x1)-Likelihood(x0))/1e-4;
-    case 'chi'
-        x1(2)=x0(2)+1e-4;
-        result=(Likelihood(x1)-Likelihood(x0))/1e-4;
-    case 'psi'
-        x1(3)=x0(3)+1e-4;
-        result=(Likelihood(x1)-Likelihood(x0))/1e-4;
-    case 'mu'
-        x1(4)=x0(4)+1e-4;
-        result=(Likelihood(x1)-Likelihood(x0))/1e-4;
-    case  'sigma'
-        x1(5)=x0(5)+1e-4;
-        result=(Likelihood(x1)-Likelihood(x0))/1e-4;
-    case  'gamma'
-        x1(6)=x0(6)+1e-4;
-        result=(Likelihood(x1)-Likelihood(x0))/1e-4;
-end
-end
-
 function LogL = GHLike(x,Params)
 
 lambda=Params(1);
@@ -328,19 +211,4 @@ LogL=-sum(LogL);
 
 end
 
-function Logl=NormalLike(x, Params)
-mu=Params(1);
-sigma=Params(2);
-
-LogL=-log(sqrt(2.*pi).*sigma)-((x-mu)./sigma).^2./2;
-
-Logl=-sum(LogL)/length(x);
-end
-
-function f=PDF(x,Params)
-mu=Params(1);
-sigma=Params(2);
-
-f=1./(sqrt(2.*pi).*sigma).*exp(-((x-mu)./sigma).^2./2);
-end
 

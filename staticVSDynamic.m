@@ -39,6 +39,7 @@ set(gcf,'Position',[100 100 700 550])
 xlabel("theta0",'FontSize',12,'FontWeight','bold')
 ylabel("Expected Utility",'FontSize',12,'FontWeight','bold')
 legend("static","dynamic",'FontSize',12)
+
 %%
 % ration of information cost when theta0=1.15 and theta0=0.95
 % initial parameter value
@@ -108,6 +109,7 @@ xlabel('\gamma','FontWeight','bold','FontSize',12)
 ylabel('cE(q^*)+F/E(\omega^*(q^*))','FontWeight','bold','FontSize',12)
 title('$\hat{\theta}_0=0.95<-G/b$','Interpreter','latex','FontWeight','bold','FontSize',12)
 legend("static","dynamic",'FontSize',12)
+
 %%
 % s0 with repsect to the optimal q and exptect w
 s0 = 0.001:0.00005:0.01;
