@@ -2,12 +2,8 @@
 clear;clc;close all
 addpath(genpath('utils'));
 %%
-% compute the expected utility
-euStatic=[];
-euDynamic=[];
-
-% initla value
-s0 = 0.01;
+% compute expected utility, ration, expected q, expected w with respect theta0
+s0 =0.01;
 gamma = 0.01;
 kappa = 100;
 c = 0.01;
@@ -15,34 +11,71 @@ F = 5;
 R = exp(0.05);
 G = -0.5;
 b = 0.5;
-theta0=0.6:0.01:1.5;
+theta0=0.6:0.01:3.5;
 
+StaticQ=[];
+DynamicQ=[];
+StaticExpectedUtility=[];
+DynamicExpectedUtility=[];
+StaticRatio=[];
+DynamicRatio=[];
+StaticW=[];
+DynamicW=[];
 for i=theta0
-    i
-    % static
+    disp(i)
     optimalQ=solveFirstOrder(i,s0,gamma,kappa,c,F,R,G,b);
-    euStatic(end+1)=staticUtilityStar(i,optimalQ,s0,gamma,kappa,c,F,R,G,b);
+    % check the value information condition
+    if valueInformation(i,optimalQ,s0,gamma,kappa,c,F,R,G,b)<0
+        optimalQ=0;
+    end
+    StaticQ(end+1)=optimalQ;
+    StaticW(end+1)=staticExpectedOmegaStar(i,optimalQ,gamma,s0,b,G);
+    StaticExpectedUtility(end+1)=staticUtilityStar(i,optimalQ,s0,gamma,kappa,c,F,R,G,b);
+    StaticRatio(end+1)=(c*optimalQ+F)/staticExpectedOmegaStar(i,optimalQ,gamma,s0,b,G);
     
-    % dynamic
     result=HMsimPnL(i,0,2,s0,gamma,kappa,c,F,R,G,b);
     thetaqList=result(:,1);
     qList=result(:,2);
-    euDynamic(end+1)=dynamicUtilityStar(thetaqList,qList,s0,gamma,kappa,c,F,R,G,b);
-    
+    DynamicQ(end+1)=mean(qList);
+    DynamicW(end+1)=mean(omegaStar(thetaqList,qList,gamma,s0,b,G));
+    DynamicExpectedUtility(end+1)=dynamicUtilityStar(thetaqList,qList,s0,gamma,kappa,c,F,R,G,b);
+    DynamicRatio(end+1)=(c*mean(qList)+F)/mean(omegaStar(thetaqList,qList,gamma,s0,b,G));
 end
-
-figure(1);
-plot(theta0,euStatic,'--')
+figure;
+subplot(221)
+plot(theta0,StaticQ,'--')
 hold on
-plot(theta0,euDynamic,'-.')
-set(gcf,'Position',[100 100 700 550])
-xlabel("theta0",'FontSize',12,'FontWeight','bold')
+plot(theta0,DynamicQ,'-.')
+ylabel('E(q^*)','FontWeight','bold','FontSize',12)
+
+subplot(222)
+plot(theta0,StaticW,'--')
+hold on
+plot(theta0,DynamicW,'-.')
+ylabel('E(\omega^*(q^*))','FontWeight','bold','FontSize',12)
+
+subplot(223)
+plot(theta0,StaticExpectedUtility,'--')
+hold on
+plot(theta0,DynamicExpectedUtility,'-.')
 ylabel("Expected Utility",'FontSize',12,'FontWeight','bold')
-legend("static","dynamic",'FontSize',12)
+
+subplot(224)
+plot(theta0,StaticRatio,'--')
+hold on
+plot(theta0,DynamicRatio,'-.')
+xlabel("\theta0",'FontSize',12,'FontWeight','bold')
+ylabel('cE(q^*)+F/E(\omega^*(q^*))','FontWeight','bold','FontSize',12)
+
+% Give common xlabel, ylabel and title to your figure
+han=axes(fig,'visible','off'); 
+han.Title.Visible='on';
+han.XLabel.Visible='on';
+han.YLabel.Visible='on';
+xlabel(han,"\theta0",'FontSize',12,'FontWeight','bold')
 
 %%
-% ration of information cost when theta0=1.15 and theta0=0.95
-% initial parameter value
+% compute expected utility, ration, expected q, expected w with respect gamma
 s0 = 0.01;
 gamma=0.006:0.001:0.014;
 kappa = 100;
@@ -51,224 +84,253 @@ F = 5;
 R = exp(0.05);
 G = -0.5;
 b = 0.5;
-theta0_1=1.15;
-theta0_2=0.95;
+theta0_tmp1=1.15;
+theta0_tmp2=0.95;
 
-% store the ration information cost
-StaticRation_theta115=[];
-DynamicRation_theta115=[];
-StaticRation_theta095=[];
-DynamicRation_theta095=[];
-
+StaticQ=[];
+DynamicQ=[];
+StaticExpectedUtility=[];
+DynamicExpectedUtility=[];
+StaticRatio=[];
+DynamicRatio=[];
+StaticW=[];
+DynamicW=[];
 for i=gamma
-    i
+    disp(i)
     % theta0=1.15
-    optimalQ=solveFirstOrder(theta0_1,s0,i,kappa,c,F,R,G,b);
+    optimalQ=solveFirstOrder(theta0_tmp1,s0,i,kappa,c,F,R,G,b);
     % check the value information condition
-    if (valueInformation(theta0_1,optimalQ,s0,i,kappa,c,F,R,G,b)<0)
+    if valueInformation(theta0_tmp1,optimalQ,s0,i,kappa,c,F,R,G,b)<0
         optimalQ=0;
     end
-    StaticQ=optimalQ;
-    StaticRation_theta115(end+1)=(c*optimalQ+F)/staticExpectedOmegaStar(theta0_1,optimalQ,i,s0,b,G);
-    
-    result=HMsimPnL(theta0_1,0,2,s0,i,kappa,c,F,R,G,b);
-    thetaqList=result(:,1);
-    qList=result(:,2);
-    DynamicRation_theta115(end+1)=(c*mean(qList)+F)/mean(omegaStar(thetaqList,qList,i,s0,b,G));
-    
+    StaticQ(end+1,1)=optimalQ;
+    StaticW(end+1,1)=staticExpectedOmegaStar(theta0_tmp1,optimalQ,i,s0,b,G);
+    StaticExpectedUtility(end+1,1)=staticUtilityStar(theta0_tmp1,optimalQ,s0,i,kappa,c,F,R,G,b);
+    StaticRatio(end+1,1)=(c*optimalQ+F)/staticExpectedOmegaStar(theta0_tmp1,optimalQ,i,s0,b,G);
     % theta0=0.95
-    optimalQ=solveFirstOrder(theta0_2,s0,i,kappa,c,F,R,G,b);
+    optimalQ=solveFirstOrder(theta0_tmp2,s0,i,kappa,c,F,R,G,b);
     % check the value information condition
-    if (valueInformation(theta0_2,optimalQ,s0,i,kappa,c,F,R,G,b)<0)
+    if valueInformation(theta0_tmp2,optimalQ,s0,i,kappa,c,F,R,G,b)<0
         optimalQ=0;
     end
-    StaticQ=optimalQ;
-    StaticRation_theta095(end+1)=(c*optimalQ+F)/staticExpectedOmegaStar(theta0_2,optimalQ,i,s0,b,G);
+    StaticQ(end,2)=optimalQ;
+    StaticW(end,2)=staticExpectedOmegaStar(theta0_tmp2,optimalQ,i,s0,b,G);
+    StaticExpectedUtility(end,2)=staticUtilityStar(theta0_tmp2,optimalQ,s0,i,kappa,c,F,R,G,b);
+    StaticRatio(end,2)=(c*optimalQ+F)/staticExpectedOmegaStar(theta0_tmp2,optimalQ,i,s0,b,G);
     
-    result=HMsimPnL(theta0_2,0,2,s0,i,kappa,c,F,R,G,b);
+    % theta0=1.15
+    result=HMsimPnL(theta0_tmp1,0,2,s0,i,kappa,c,F,R,G,b);
     thetaqList=result(:,1);
     qList=result(:,2);
-    DynamicRation_theta095(end+1)=(c*mean(qList)+F)/mean(omegaStar(thetaqList,qList,i,s0,b,G));
-    
+    DynamicQ(end+1,1)=mean(qList);
+    DynamicW(end+1,1)=mean(omegaStar(thetaqList,qList,i,s0,b,G));
+    DynamicExpectedUtility(end+1,1)=dynamicUtilityStar(thetaqList,qList,s0,i,kappa,c,F,R,G,b);
+    DynamicRatio(end+1,1)=(c*mean(qList)+F)/mean(omegaStar(thetaqList,qList,i,s0,b,G));
+    % theta0=0.95
+    result=HMsimPnL(theta0_tmp2,0,2,s0,i,kappa,c,F,R,G,b);
+    thetaqList=result(:,1);
+    qList=result(:,2);
+    DynamicQ(end,2)=mean(qList);
+    DynamicW(end,2)=mean(omegaStar(thetaqList,qList,i,s0,b,G));
+    DynamicExpectedUtility(end,2)=dynamicUtilityStar(thetaqList,qList,s0,i,kappa,c,F,R,G,b);
+    DynamicRatio(end,2)=(c*mean(qList)+F)/mean(omegaStar(thetaqList,qList,i,s0,b,G));
 end
-figure;
-subplot(211)
-plot(gamma,StaticRation_theta115,'--')
+% plot theta0=1.15
+fig=figure;
+subplot(221)
+plot(gamma,StaticQ(:,1),'LineStyle','--')
 hold on
-plot(gamma,DynamicRation_theta115,'-.')
-xlabel('\gamma','FontWeight','bold','FontSize',12)
-ylabel('cE(q^*)+F/E(\omega^*(q^*))','FontWeight','bold','FontSize',12)
-title('$\hat{\theta}_0=1.15>-G/b$','Interpreter','latex','FontWeight','bold','FontSize',12)
+plot(gamma,DynamicQ(:,1),'LineStyle','-.')
+ylabel('E(q^*)','FontWeight','bold','FontSize',12)
+
+subplot(222)
+plot(gamma,StaticW(:,1),'LineStyle','--')
+hold on
+plot(gamma,DynamicW(:,1),'LineStyle','-.')
+ylabel('E(\omega^*(q^*))','FontWeight','bold','FontSize',12)
+
+subplot(223)
+plot(gamma,StaticExpectedUtility(:,1),'LineStyle','--')
+hold on
+plot(gamma,DynamicExpectedUtility(:,1),'LineStyle','-.')
+ylabel("Expected Utility",'FontSize',12,'FontWeight','bold')
+
+subplot(224)
+plot(gamma,StaticRatio(:,1),'LineStyle','--')
+hold on
+plot(gamma,DynamicRatio(:,1),'LineStyle','-.')
+ylabel("cE(q^*)+F/E(\omega^*(q^*))",'FontSize',12,'FontWeight','bold')
 legend("static","dynamic",'FontSize',12)
 
-subplot(212)
-plot(gamma,StaticRation_theta095,'--')
+% Give common xlabel, ylabel and title to your figure
+han=axes(fig,'visible','off'); 
+han.Title.Visible='on';
+han.XLabel.Visible='on';
+han.YLabel.Visible='on';
+xlabel(han,'\gamma','FontSize',12,'FontWeight','bold')
+title(han,'theta0=1.15','FontWeight','bold','FontSize',12)
+
+% plot theta0=1.15
+fig=figure;
+subplot(221)
+plot(gamma,StaticQ(:,2),'LineStyle','--')
 hold on
-plot(gamma,DynamicRation_theta095,'-.')
-xlabel('\gamma','FontWeight','bold','FontSize',12)
-ylabel('cE(q^*)+F/E(\omega^*(q^*))','FontWeight','bold','FontSize',12)
-title('$\hat{\theta}_0=0.95<-G/b$','Interpreter','latex','FontWeight','bold','FontSize',12)
+plot(gamma,DynamicQ(:,2),'LineStyle','-.')
+ylabel('E(q^*)','FontWeight','bold','FontSize',12)
+
+subplot(222)
+plot(gamma,StaticW(:,2),'LineStyle','--')
+hold on
+plot(gamma,DynamicW(:,2),'LineStyle','-.')
+ylabel('E(\omega^*(q^*))','FontWeight','bold','FontSize',12)
+
+subplot(223)
+plot(gamma,StaticExpectedUtility(:,2),'LineStyle','--')
+hold on
+plot(gamma,DynamicExpectedUtility(:,2),'LineStyle','-.')
+ylabel("Expected Utility",'FontSize',12,'FontWeight','bold')
+
+subplot(224)
+plot(gamma,StaticRatio(:,2),'LineStyle','--')
+hold on
+plot(gamma,DynamicRatio(:,2),'LineStyle','-.')
+ylabel("cE(q^*)+F/E(\omega^*(q^*))",'FontSize',12,'FontWeight','bold')
 legend("static","dynamic",'FontSize',12)
 
+% Give common xlabel, ylabel and title to your figure
+han=axes(fig,'visible','off'); 
+han.Title.Visible='on';
+han.XLabel.Visible='on';
+han.YLabel.Visible='on';
+xlabel(han,'\gamma','FontSize',12,'FontWeight','bold')
+title('theta0=0.95','FontWeight','bold','FontSize',12)
 %%
-% s0 with repsect to the optimal q and exptect w
+% compute expected utility, ration, expected q, expected w with respect s0
 s0 = 0.001:0.00005:0.01;
-gamma=0.01;
+gamma = 0.01;
 kappa = 100;
 c = 0.01;
 F = 5;
 R = exp(0.05);
 G = -0.5;
 b = 0.5;
-theta0_1=1.15;
-theta0_2=0.95;
+theta0_tmp1=1.15;
+theta0_tmp2=0.95;
 
-% initial list to restore variable
-StaticQ_theta115=[];
-DynamicQ_theta115=[];
-StaticQ_theta095=[];
-DynamicQ_theta095=[];
-
-StaticW_theta115=[];
-DynamicW_theta115=[];
-StaticW_theta095=[];
-DynamicW_theta095=[];
-
-
-for i =s0
-    i
+StaticQ=[];
+DynamicQ=[];
+StaticExpectedUtility=[];
+DynamicExpectedUtility=[];
+StaticRatio=[];
+DynamicRatio=[];
+StaticW=[];
+DynamicW=[];
+for i=s0
+    disp(i)
     % theta0=1.15
-    [ StaticQ_theta115(end+1),StaticW_theta115(end+1),DynamicQ_theta115(end+1),DynamicW_theta115(end+1)]=...
-        ComputeStaticVSDynamic(theta0_1,i,gamma,kappa,c,F,R,G,b);
+    optimalQ=solveFirstOrder(theta0_tmp1,i,gamma,kappa,c,F,R,G,b);
+    % check the value information condition
+    if valueInformation(theta0_tmp1,optimalQ,i,gamma,kappa,c,F,R,G,b)<0
+        optimalQ=0;
+    end
+    StaticQ(end+1,1)=optimalQ;
+    StaticW(end+1,1)=staticExpectedOmegaStar(theta0_tmp1,optimalQ,gamma,i,b,G);
+    StaticExpectedUtility(end+1,1)=staticUtilityStar(theta0_tmp1,optimalQ,i,gamma,kappa,c,F,R,G,b);
+    StaticRatio(end+1,1)=(c*optimalQ+F)/staticExpectedOmegaStar(theta0_tmp1,optimalQ,gamma,i,b,G);
+    % theta0=0.95
+    optimalQ=solveFirstOrder(theta0_tmp2,i,gamma,kappa,c,F,R,G,b);
+    % check the value information condition
+    if valueInformation(theta0_tmp2,optimalQ,i,gamma,kappa,c,F,R,G,b)<0
+        optimalQ=0;
+    end
+    StaticQ(end,2)=optimalQ;
+    StaticW(end,2)=staticExpectedOmegaStar(theta0_tmp2,optimalQ,gamma,i,b,G);
+    StaticExpectedUtility(end,2)=staticUtilityStar(theta0_tmp2,optimalQ,i,gamma,kappa,c,F,R,G,b);
+    StaticRatio(end,2)=(c*optimalQ+F)/staticExpectedOmegaStar(theta0_tmp2,optimalQ,gamma,i,b,G);
     
-    [ StaticQ_theta095(end+1),StaticW_theta095(end+1),DynamicQ_theta095(end+1),DynamicW_theta095(end+1)]=...
-        ComputeStaticVSDynamic(theta0_2,i,gamma,kappa,c,F,R,G,b);
-end
-figure;
-subplot(211)
-plot(s0,StaticQ_theta115,'--')
-hold on
-plot(s0,DynamicQ_theta115,'-.')
-xlabel('s0','FontWeight','bold','FontSize',12)
-ylabel('E(q^*)','FontWeight','bold','FontSize',12)
-title('$\hat{\theta}_0=1.15>-G/b$','Interpreter','latex','FontWeight','bold','FontSize',12)
-legend("static","dynamic",'FontSize',12)
-
-subplot(212)
-plot(s0,StaticQ_theta095,'--')
-hold on
-plot(s0,DynamicQ_theta095,'-.')
-xlabel('s0','FontWeight','bold','FontSize',12)
-ylabel('E(q^*)','FontWeight','bold','FontSize',12)
-title('$\hat{\theta}_0=0.95<-G/b$','Interpreter','latex','FontWeight','bold','FontSize',12)
-legend("static","dynamic",'FontSize',12)
-
-figure;
-subplot(211)
-plot(s0,StaticW_theta115,'--')
-hold on
-plot(s0,DynamicW_theta115,'-.')
-xlabel('s0','FontWeight','bold','FontSize',12)
-ylabel('E(\omega^*(q^*))','FontWeight','bold','FontSize',12)
-title('$\hat{\theta}_0=1.15>-G/b$','Interpreter','latex','FontWeight','bold','FontSize',12)
-legend("static","dynamic",'FontSize',12)
-
-subplot(212)
-plot(s0,StaticW_theta095,'--')
-hold on
-plot(s0,DynamicW_theta095,'-.')
-xlabel('s0','FontWeight','bold','FontSize',12)
-ylabel('E(\omega^*(q^*))','FontWeight','bold','FontSize',12)
-title('$\hat{\theta}_0=0.95<-G/b$','Interpreter','latex','FontWeight','bold','FontSize',12)
-legend("static","dynamic",'FontSize',12)
-
-%%
-% gamma with repsect to the optimal q and exptect w
-s0 = 0.01;
-gamma=0.006:0.001:0.014;
-kappa = 100;
-c = 0.01;
-F = 5;
-R = exp(0.05);
-G = -0.5;
-b = 0.5;
-theta0_1=1.15;
-theta0_2=0.95;
-
-% initial list to restore variable
-StaticQ_theta115=[];
-DynamicQ_theta115=[];
-StaticQ_theta095=[];
-DynamicQ_theta095=[];
-
-StaticW_theta115=[];
-DynamicW_theta115=[];
-StaticW_theta095=[];
-DynamicW_theta095=[];
-
-
-for i =gamma
-    i
     % theta0=1.15
-    [ StaticQ_theta115(end+1),StaticW_theta115(end+1),DynamicQ_theta115(end+1),DynamicW_theta115(end+1)]=...
-        ComputeStaticVSDynamic(theta0_1,s0,i,kappa,c,F,R,G,b);
-    
-    [ StaticQ_theta095(end+1),StaticW_theta095(end+1),DynamicQ_theta095(end+1),DynamicW_theta095(end+1)]=...
-        ComputeStaticVSDynamic(theta0_2,s0,i,kappa,c,F,R,G,b);
+    result=HMsimPnL(theta0_tmp1,0,2,i,gamma,kappa,c,F,R,G,b);
+    thetaqList=result(:,1);
+    qList=result(:,2);
+    DynamicQ(end+1,1)=mean(qList);
+    DynamicW(end+1,1)=mean(omegaStar(thetaqList,qList,gamma,i,b,G));
+    DynamicExpectedUtility(end+1,1)=dynamicUtilityStar(thetaqList,qList,i,gamma,kappa,c,F,R,G,b);
+    DynamicRatio(end+1,1)=(c*mean(qList)+F)/mean(omegaStar(thetaqList,qList,gamma,i,b,G));
+    % theta0=0.95
+    result=HMsimPnL(theta0_tmp2,0,2,i,gamma,kappa,c,F,R,G,b);
+    thetaqList=result(:,1);
+    qList=result(:,2);
+    DynamicQ(end,2)=mean(qList);
+    DynamicW(end,2)=mean(omegaStar(thetaqList,qList,gamma,i,b,G));
+    DynamicExpectedUtility(end,2)=dynamicUtilityStar(thetaqList,qList,i,gamma,kappa,c,F,R,G,b);
+    DynamicRatio(end,2)=(c*mean(qList)+F)/mean(omegaStar(thetaqList,qList,gamma,i,b,G));
 end
-figure;
-subplot(211)
-plot(gamma,StaticQ_theta115,'--')
+% plot theta0=1.15
+fig=figure;
+subplot(221)
+plot(s0,StaticQ(:,1),'LineStyle','--')
 hold on
-plot(gamma,DynamicQ_theta115,'-.')
-xlabel('\gamma','FontWeight','bold','FontSize',12)
+plot(s0,DynamicQ(:,1),'LineStyle','-.')
 ylabel('E(q^*)','FontWeight','bold','FontSize',12)
-title('$\hat{\theta}_0=1.15>-G/b$','Interpreter','latex','FontWeight','bold','FontSize',12)
+
+subplot(222)
+plot(s0,StaticW(:,1),'LineStyle','--')
+hold on
+plot(s0,DynamicW(:,1),'LineStyle','-.')
+ylabel('E(\omega^*(q^*))','FontWeight','bold','FontSize',12)
+
+subplot(223)
+plot(s0,StaticExpectedUtility(:,1),'LineStyle','--')
+hold on
+plot(s0,DynamicExpectedUtility(:,1),'LineStyle','-.')
+ylabel("Expected Utility",'FontSize',12,'FontWeight','bold')
+
+subplot(224)
+plot(s0,StaticRatio(:,1),'LineStyle','--')
+hold on
+plot(s0,DynamicRatio(:,1),'LineStyle','-.')
+ylabel("cE(q^*)+F/E(\omega^*(q^*))",'FontSize',12,'FontWeight','bold')
 legend("static","dynamic",'FontSize',12)
 
-subplot(212)
-plot(gamma,StaticQ_theta095,'--')
+% Give common xlabel, ylabel and title to your figure
+han=axes(fig,'visible','off'); 
+han.Title.Visible='on';
+han.XLabel.Visible='on';
+han.YLabel.Visible='on';
+xlabel(han,'s0','FontSize',12,'FontWeight','bold')
+title(han,'theta0=1.15','FontWeight','bold','FontSize',12)
+
+% plot theta0=0.95
+fig=figure;
+subplot(221)
+plot(s0,StaticQ(:,2),'LineStyle','--')
 hold on
-plot(gamma,DynamicQ_theta095,'-.')
-xlabel('\gamma','FontWeight','bold','FontSize',12)
+plot(s0,DynamicQ(:,2),'LineStyle','-.')
 ylabel('E(q^*)','FontWeight','bold','FontSize',12)
-title('$\hat{\theta}_0=0.95<-G/b$','Interpreter','latex','FontWeight','bold','FontSize',12)
-legend("static","dynamic",'FontSize',12)
 
-figure;
-subplot(211)
-plot(gamma,StaticW_theta115,'--')
+subplot(222)
+plot(s0,StaticW(:,2),'LineStyle','--')
 hold on
-plot(gamma,DynamicW_theta115,'-.')
-xlabel('\gamma','FontWeight','bold','FontSize',12)
+plot(s0,DynamicW(:,2),'LineStyle','-.')
 ylabel('E(\omega^*(q^*))','FontWeight','bold','FontSize',12)
-title('$\hat{\theta}_0=1.15>-G/b$','Interpreter','latex','FontWeight','bold','FontSize',12)
-legend("static","dynamic",'FontSize',12)
 
-subplot(212)
-plot(gamma,StaticW_theta095,'--')
+subplot(223)
+plot(s0,StaticExpectedUtility(:,2),'LineStyle','--')
 hold on
-plot(gamma,DynamicW_theta095,'-.')
-xlabel('\gamma','FontWeight','bold','FontSize',12)
-ylabel('E(\omega^*(q^*))','FontWeight','bold','FontSize',12)
-title('$\hat{\theta}_0=0.95<-G/b$','Interpreter','latex','FontWeight','bold','FontSize',12)
+plot(s0,DynamicExpectedUtility(:,2),'LineStyle','-.')
+ylabel("Expected Utility",'FontSize',12,'FontWeight','bold')
+
+subplot(224)
+plot(s0,StaticRatio(:,2),'LineStyle','--')
+hold on
+plot(s0,DynamicRatio(:,2),'LineStyle','-.')
+ylabel("cE(q^*)+F/E(\omega^*(q^*))",'FontSize',12,'FontWeight','bold')
 legend("static","dynamic",'FontSize',12)
 
-%%
-function [StaticQ,StaticW,DynamicQ,DynamicW]=ComputeStaticVSDynamic(theta0,s0,gamma,kappa,c,F,R,G,b)
-optimalQ=solveFirstOrder(theta0,s0,gamma,kappa,c,F,R,G,b);
-% check the value information condition
-if (valueInformation(theta0,optimalQ,s0,gamma,kappa,c,F,R,G,b)<0)
-    optimalQ=0;
-end
-
-StaticQ=optimalQ;
-StaticW=staticExpectedOmegaStar(theta0,optimalQ,gamma,s0,b,G);
-
-result=HMsimPnL(theta0,0,2,s0,gamma,kappa,c,F,R,G,b);
-thetaqList=result(:,1);
-qList=result(:,2);
-DynamicQ=mean(qList);
-DynamicW=mean(omegaStar(thetaqList,qList,gamma,s0,b,G));
-
-end
+% Give common xlabel, ylabel and title to your figure
+han=axes(fig,'visible','off'); 
+han.Title.Visible='on';
+han.XLabel.Visible='on';
+han.YLabel.Visible='on';
+xlabel(han,'s0','FontSize',12,'FontWeight','bold')
+title('theta0=0.95','FontWeight','bold','FontSize',12)
