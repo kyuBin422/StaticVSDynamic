@@ -15,7 +15,7 @@ close(figure(1));close(figure(2))
 
 T = s0*9998/10000;
 
-rounds = 1000;
+rounds = 100;
 
 X = 1; %this has to correspond to the paramenters in HMdynamicFD
 [~, ~,M]=HMdynamicFD(X, s0, gamma, kappa, c, F, R, G, b);
@@ -30,7 +30,7 @@ else
     close(1)
 end
 
-parfor i = 1:rounds
+for i = 1:rounds
     
     % create brownian motion with drift = 0, volatility 1
     obj = bm(0,1);
@@ -58,8 +58,7 @@ parfor i = 1:rounds
     % check at which index it hits boundary
     stopping_indx = HMstop(M, T1plot, X1plot);
     [~,I] = min(abs(T1plot-stopping_indx));
-    stopping_indx=I+4;
-%     stopping_indx=stopping_indx+2;
+    stopping_indx=I;
     if p == 1
         plot(T1plot(1:stopping_indx), X1plot(1:stopping_indx));
     end

@@ -125,7 +125,7 @@ exRegion(t<(s0-2*c*gamma*R),flag)=0;
 %plot exercise region
 figure (1)
 %contourf(exRegion');
-M = contour(exRegion','k');
+M = contour(exRegion',[1 1],'k');
 
 xlabel('$q$','Interpreter','latex');
 ylabel('$\hat{\theta}_q$','Interpreter','latex');

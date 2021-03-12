@@ -41,7 +41,7 @@ for i=theta0
     DynamicExpectedUtility(end+1)=dynamicUtilityStar(thetaqList,qList,s0,gamma,kappa,c,F,R,G,b);
     DynamicRatio(end+1)=(c*mean(qList)+F)/mean(omegaStar(thetaqList,qList,gamma,s0,b,G));
 end
-figure;
+fig=figure;
 subplot(221)
 plot(theta0,StaticQ,'--')
 hold on
@@ -64,15 +64,15 @@ subplot(224)
 plot(theta0,StaticRatio,'--')
 hold on
 plot(theta0,DynamicRatio,'-.')
-xlabel("\theta0",'FontSize',12,'FontWeight','bold')
 ylabel('cE(q^*)+F/E(\omega^*(q^*))','FontWeight','bold','FontSize',12)
+legend("static","dynamic",'FontSize',12)
 
 % Give common xlabel, ylabel and title to your figure
 han=axes(fig,'visible','off'); 
 han.Title.Visible='on';
 han.XLabel.Visible='on';
 han.YLabel.Visible='on';
-xlabel(han,"\theta0",'FontSize',12,'FontWeight','bold')
+xlabel(han,"\theta_0",'FontSize',12,'FontWeight','bold')
 
 %%
 % compute expected utility, ration, expected q, expected w with respect gamma

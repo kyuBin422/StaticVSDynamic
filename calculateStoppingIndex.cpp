@@ -21,7 +21,7 @@ public:
 	double calculateStoppingIndex(matlab::data::TypedArray<double> MexX, matlab::data::TypedArray<double> MexY,
 		matlab::data::TypedArray<double> PathX, matlab::data::TypedArray<double> PathY) {
 		vector<double> vectorPathX, vectorPathY, vectorMexX, vectorMexY;
-
+		//TypedArray to c++ vector
 		for (auto value : MexX)
 		{
 			vectorMexX.push_back(value);
@@ -39,13 +39,14 @@ public:
 			vectorPathY.push_back(value);
 		}
 
-		for (int i = 0; i < vectorPathX.size() - 1; i++)
+		for (int i = 0; i < vectorPathX.size(); i++)
 		{
 			double x1 = vectorPathX[i], y1 = vectorPathY[i];
 			double x2 = vectorPathX[i + 1], y2 = vectorPathY[i + 1];
-
+			//fix the outside boundary
 			for (int j = 0; j < vectorMexX.size() - 1; j++)
 			{
+				
 				double x3 = vectorMexX[j], y3 = vectorMexY[j];
 				double x4 = vectorMexX[j + 1], y4 = vectorMexY[j + 1];
 
@@ -69,5 +70,4 @@ public:
 		}
 		return 1;
 	}
-
 };
