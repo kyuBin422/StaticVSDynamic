@@ -41,38 +41,14 @@ for i=theta0
     DynamicExpectedUtility(end+1)=dynamicUtilityStar(thetaqList,qList,s0,gamma,kappa,c,F,R,G,b);
     DynamicRatio(end+1)=(c*mean(qList)+F)/mean(omegaStar(thetaqList,qList,gamma,s0,b,G));
 end
-fig=figure;
-subplot(221)
-plot(theta0,StaticQ,'--')
-hold on
-plot(theta0,DynamicQ,'-.')
-ylabel('E(q^*)','FontWeight','bold','FontSize',12)
 
-subplot(222)
-plot(theta0,StaticW,'--')
-hold on
-plot(theta0,DynamicW,'-.')
-ylabel('E(\omega^*(q^*))','FontWeight','bold','FontSize',12)
+vector2File(theta0,StaticQ,DynamicQ,'\theta_0','E(q^*)','',false,"theta_0 vs Eq")
 
-subplot(223)
-plot(theta0,StaticExpectedUtility,'--')
-hold on
-plot(theta0,DynamicExpectedUtility,'-.')
-ylabel("Expected Utility",'FontSize',12,'FontWeight','bold')
+vector2File(theta0,StaticW,DynamicW,'\theta_0','E(q^*)','',false,"theta_0 vs omega")
 
-subplot(224)
-plot(theta0,StaticRatio,'--')
-hold on
-plot(theta0,DynamicRatio,'-.')
-ylabel('cE(q^*)+F/E(\omega^*(q^*))','FontWeight','bold','FontSize',12)
-legend("static","dynamic",'FontSize',12)
+vector2File(theta0,StaticExpectedUtility,DynamicExpectedUtility,'\theta_0','Expected Utility','',true,"theta_0 vs Expected Utility")
 
-% Give common xlabel, ylabel and title to your figure
-han=axes(fig,'visible','off'); 
-han.Title.Visible='on';
-han.XLabel.Visible='on';
-han.YLabel.Visible='on';
-xlabel(han,"\theta_0",'FontSize',12,'FontWeight','bold')
+vector2File(theta0,StaticRatio,DynamicRatio,'\theta_0','cE(q^*)+F/E(\omega^*(q^*))','',true,"theta_0 vs ratio information")
 
 %%
 % compute expected utility, ration, expected q, expected w with respect gamma
@@ -136,77 +112,26 @@ for i=gamma
     DynamicRatio(end,2)=(c*mean(qList)+F)/mean(omegaStar(thetaqList,qList,i,s0,b,G));
 end
 % plot theta0=1.15
-fig=figure;
-subplot(221)
-plot(gamma,StaticQ(:,1),'LineStyle','--')
-hold on
-plot(gamma,DynamicQ(:,1),'LineStyle','-.')
-ylabel('E(q^*)','FontWeight','bold','FontSize',12)
+vector2File(gamma,StaticQ(:,1),DynamicQ(:,1),'\gamma','E(q^*)','theta0=1.15',true,"gamma vs Eq theta0=115")
 
-subplot(222)
-plot(gamma,StaticW(:,1),'LineStyle','--')
-hold on
-plot(gamma,DynamicW(:,1),'LineStyle','-.')
-ylabel('E(\omega^*(q^*))','FontWeight','bold','FontSize',12)
+vector2File(gamma,StaticW(:,1),DynamicW(:,1),'\gamma','E(\omega^*(q^*))','theta0=1.15',true,"gamma vs omega theta0=115")
 
-subplot(223)
-plot(gamma,StaticExpectedUtility(:,1),'LineStyle','--')
-hold on
-plot(gamma,DynamicExpectedUtility(:,1),'LineStyle','-.')
-ylabel("Expected Utility",'FontSize',12,'FontWeight','bold')
+vector2File(gamma,StaticExpectedUtility(:,1),DynamicExpectedUtility(:,1),'\gamma','Expected Utility','theta0=1.15',false,"gamma vs Expected Utility theta0=115")
 
-subplot(224)
-plot(gamma,StaticRatio(:,1),'LineStyle','--')
-hold on
-plot(gamma,DynamicRatio(:,1),'LineStyle','-.')
-ylabel("cE(q^*)+F/E(\omega^*(q^*))",'FontSize',12,'FontWeight','bold')
-legend("static","dynamic",'FontSize',12)
+vector2File(gamma,StaticRatio(:,1),DynamicRatio(:,1),'\gamma','cE(q^*)+F/E(\omega^*(q^*))','theta0=1.15',false,"gamma vs ratio information theta0=115")
 
-% Give common xlabel, ylabel and title to your figure
-han=axes(fig,'visible','off'); 
-han.Title.Visible='on';
-han.XLabel.Visible='on';
-han.YLabel.Visible='on';
-xlabel(han,'\gamma','FontSize',12,'FontWeight','bold')
-title(han,'theta0=1.15','FontWeight','bold','FontSize',12)
+% plot theta0=0.95
+vector2File(gamma,StaticQ(:,2),DynamicQ(:,2),'\gamma','E(q^*)','theta0=0.95',true,"gamma vs Eq theta0=095")
 
-% plot theta0=1.15
-fig=figure;
-subplot(221)
-plot(gamma,StaticQ(:,2),'LineStyle','--')
-hold on
-plot(gamma,DynamicQ(:,2),'LineStyle','-.')
-ylabel('E(q^*)','FontWeight','bold','FontSize',12)
+vector2File(gamma,StaticW(:,2),DynamicW(:,2),'\gamma','E(\omega^*(q^*))','theta0=1.95',true,"gamma vs omega theta0=095")
 
-subplot(222)
-plot(gamma,StaticW(:,2),'LineStyle','--')
-hold on
-plot(gamma,DynamicW(:,2),'LineStyle','-.')
-ylabel('E(\omega^*(q^*))','FontWeight','bold','FontSize',12)
+vector2File(gamma,StaticExpectedUtility(:,2),DynamicExpectedUtility(:,2),'\gamma','Expected Utility','theta0=1.95',false,"gamma vs Expected Utility theta0=095")
 
-subplot(223)
-plot(gamma,StaticExpectedUtility(:,2),'LineStyle','--')
-hold on
-plot(gamma,DynamicExpectedUtility(:,2),'LineStyle','-.')
-ylabel("Expected Utility",'FontSize',12,'FontWeight','bold')
+vector2File(gamma,StaticRatio(:,2),DynamicRatio(:,2),'\gamma','cE(q^*)+F/E(\omega^*(q^*))','theta0=1.95',false,"gamma vs ratio information theta0=095")
 
-subplot(224)
-plot(gamma,StaticRatio(:,2),'LineStyle','--')
-hold on
-plot(gamma,DynamicRatio(:,2),'LineStyle','-.')
-ylabel("cE(q^*)+F/E(\omega^*(q^*))",'FontSize',12,'FontWeight','bold')
-legend("static","dynamic",'FontSize',12)
-
-% Give common xlabel, ylabel and title to your figure
-han=axes(fig,'visible','off'); 
-han.Title.Visible='on';
-han.XLabel.Visible='on';
-han.YLabel.Visible='on';
-xlabel(han,'\gamma','FontSize',12,'FontWeight','bold')
-title('theta0=0.95','FontWeight','bold','FontSize',12)
 %%
 % compute expected utility, ration, expected q, expected w with respect s0
-s0 = 0.001:0.00005:0.01;
+s0 = 0.001:0.001:0.01;
 gamma = 0.01;
 kappa = 100;
 c = 0.01;
@@ -266,71 +191,38 @@ for i=s0
     DynamicRatio(end,2)=(c*mean(qList)+F)/mean(omegaStar(thetaqList,qList,gamma,i,b,G));
 end
 % plot theta0=1.15
-fig=figure;
-subplot(221)
-plot(s0,StaticQ(:,1),'LineStyle','--')
-hold on
-plot(s0,DynamicQ(:,1),'LineStyle','-.')
-ylabel('E(q^*)','FontWeight','bold','FontSize',12)
+vector2File(s0,StaticQ(:,1),DynamicQ(:,1),'s0','E(q^*)','theta0=1.15',true,"s0 vs Eq theta0=115")
 
-subplot(222)
-plot(s0,StaticW(:,1),'LineStyle','--')
-hold on
-plot(s0,DynamicW(:,1),'LineStyle','-.')
-ylabel('E(\omega^*(q^*))','FontWeight','bold','FontSize',12)
+vector2File(s0,StaticW(:,1),DynamicW(:,1),'s0','E(\omega^*(q^*))','theta0=1.15',true,"s0 vs omega theta0=115")
 
-subplot(223)
-plot(s0,StaticExpectedUtility(:,1),'LineStyle','--')
-hold on
-plot(s0,DynamicExpectedUtility(:,1),'LineStyle','-.')
-ylabel("Expected Utility",'FontSize',12,'FontWeight','bold')
+vector2File(s0,StaticExpectedUtility(:,1),DynamicExpectedUtility(:,1),'s0','Expected Utility','theta0=1.15',false,"s0 vs Expected Utility theta0=115")
 
-subplot(224)
-plot(s0,StaticRatio(:,1),'LineStyle','--')
-hold on
-plot(s0,DynamicRatio(:,1),'LineStyle','-.')
-ylabel("cE(q^*)+F/E(\omega^*(q^*))",'FontSize',12,'FontWeight','bold')
-legend("static","dynamic",'FontSize',12)
-
-% Give common xlabel, ylabel and title to your figure
-han=axes(fig,'visible','off'); 
-han.Title.Visible='on';
-han.XLabel.Visible='on';
-han.YLabel.Visible='on';
-xlabel(han,'s0','FontSize',12,'FontWeight','bold')
-title(han,'theta0=1.15','FontWeight','bold','FontSize',12)
+vector2File(s0,StaticRatio(:,1),DynamicRatio(:,1),'s0','cE(q^*)+F/E(\omega^*(q^*))','theta0=1.15',false,"s0 vs ratio information theta0=115")
 
 % plot theta0=0.95
+vector2File(s0,StaticQ(:,2),DynamicQ(:,2),'s0','E(q^*)','theta0=0.95',true,"s0 vs Eq theta0=095")
+
+vector2File(s0,StaticW(:,2),DynamicW(:,2),'s0','E(\omega^*(q^*))','theta0=0.95',true,"s0 vs omega theta0=095")
+
+vector2File(s0,StaticExpectedUtility(:,2),DynamicExpectedUtility(:,2),'s0','Expected Utility','theta0=0.95',false,"s0 vs Expected Utility theta0=095")
+
+vector2File(s0,StaticRatio(:,2),DynamicRatio(:,2),'s0','cE(q^*)+F/E(\omega^*(q^*))','theta0=0.05',false,"s0 vs ratio information theta0=095")
+
+%%
+function vector2File(Para,StaticList,DynamicList,Xlabel,Ylabel,Title,LegendPosition,FileName)
 fig=figure;
-subplot(221)
-plot(s0,StaticQ(:,2),'LineStyle','--')
+plot(Para,StaticList,'--')
 hold on
-plot(s0,DynamicQ(:,2),'LineStyle','-.')
-ylabel('E(q^*)','FontWeight','bold','FontSize',12)
-
-subplot(222)
-plot(s0,StaticW(:,2),'LineStyle','--')
-hold on
-plot(s0,DynamicW(:,2),'LineStyle','-.')
-ylabel('E(\omega^*(q^*))','FontWeight','bold','FontSize',12)
-
-subplot(223)
-plot(s0,StaticExpectedUtility(:,2),'LineStyle','--')
-hold on
-plot(s0,DynamicExpectedUtility(:,2),'LineStyle','-.')
-ylabel("Expected Utility",'FontSize',12,'FontWeight','bold')
-
-subplot(224)
-plot(s0,StaticRatio(:,2),'LineStyle','--')
-hold on
-plot(s0,DynamicRatio(:,2),'LineStyle','-.')
-ylabel("cE(q^*)+F/E(\omega^*(q^*))",'FontSize',12,'FontWeight','bold')
-legend("static","dynamic",'FontSize',12)
-
-% Give common xlabel, ylabel and title to your figure
-han=axes(fig,'visible','off'); 
-han.Title.Visible='on';
-han.XLabel.Visible='on';
-han.YLabel.Visible='on';
-xlabel(han,'s0','FontSize',12,'FontWeight','bold')
-title('theta0=0.95','FontWeight','bold','FontSize',12)
+plot(Para,DynamicList,'-.')
+xlabel(Xlabel,'FontSize',12,'FontWeight','bold')
+ylabel(Ylabel,'FontWeight','bold','FontSize',12)
+title(Title,'FontSize',12,'FontWeight','bold')
+if LegendPosition
+    legend("static","dynamic",'FontSize',12)
+else
+    legend("static","dynamic",'FontSize',12,'Location','southeast')
+end
+savefig(fig,'image/'+FileName+'.fig')
+saveas(fig,'image/imageEPS/'+FileName,'epsc')
+close(fig)
+end

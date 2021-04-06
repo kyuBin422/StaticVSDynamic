@@ -100,18 +100,19 @@ exV(end,:) = V(end,2:end-1);
 for nn = n+1:-1:2
     old = B*(V(nn,2:end-1)') + (1-theta)* [ll(1)*V(nn,1); zeros(m-2,1); uu(m)*V(nn,end)]+ (theta)*[ll(1)*V(nn-1,1); zeros(m-2,1); uu(m)*V(nn-1,end)];
     new = C\old; % Value of the option
-    for i = 1:m
-        exV(nn-1,i) = g(Xmin+i*dX,s0,gamma,kappa,c,F,R,G,b,t(nn-1));
-    end
+%     for i = 1:m
+%         exV(nn-1,i) = g(Xmin+i*dX,s0,gamma,kappa,c,F,R,G,b,t(nn-1));
+%     end
+    exV(nn-1,1:m)=g(Xmin+(1:m)*dX,s0,gamma,kappa,c,F,R,G,b,t(nn-1));
     V(nn-1,2:end-1) = max( new', exV(nn-1,:) );
     Vcheck(nn-1,2:end-1) = new';
     % stasify tau is less than s0-2*c*gamma*R
     % 4.656147122503568e+03
-%     if t(nn-1)<(s0-2*c*gamma*R)
-%         flag=x>(-G/b);
-%         flag=flag(2:end-1);
-%         V(nn-1,flag)=new(flag)';
-%     end
+    %     if t(nn-1)<(s0-2*c*gamma*R)
+    %         flag=x>(-G/b);
+    %         flag=flag(2:end-1);
+    %         V(nn-1,flag)=new(flag)';
+    %     end
 end
 
 
@@ -125,8 +126,10 @@ exRegion(t<(s0-2*c*gamma*R),flag)=0;
 %plot exercise region
 figure (1)
 %contourf(exRegion');
-M = contour(exRegion',[1 1],'k');
+M = contour(exRegion','k');
+hold on
 
+xline(sum(t<(s0-2*c*gamma*R)),"--")
 xlabel('$q$','Interpreter','latex');
 ylabel('$\hat{\theta}_q$','Interpreter','latex');
 
@@ -153,6 +156,8 @@ xTicks = round( (0+ (xTicks-1)*dt)./(s0^2-s0*(0+ (xTicks-1)*dt))); %-1 here beca
 yticklabels(yTicks);
 xticklabels(xTicks);
 
+% xticks([11,25,43,67,100,150,233,400,898,499900]);
+
 end
 
 
@@ -161,11 +166,9 @@ function value = g(X,s0,gamma,kappa,c,F,R,G,b,tau)
 
 %value =  -exp( - ( (max(G + b*X,0))^2 )/(2*(s0-tau)*b^2) - gamma *( kappa- F - c*(tau)/(s0^2-s0*tau) )*(R)  );
 
-if G+b*X > 0
-    value = -exp( - ( (G + b*X)^2 )/(2*(s0-tau)*b^2) - gamma *( kappa- F - c*(tau)/(s0^2-s0*tau) )*(R)  );
-else
-    value = -exp(  - gamma *( kappa- F - c*(tau)/(s0^2-s0*tau) )*(R)  );
-end
+
+value = -exp( - ( max(G + b*X,0).^2 )./(2*(s0-tau)*b^2) - gamma *( kappa- F - c*(tau)/(s0^2-s0*tau) )*(R)  );
+
 
 
 %if G+b*X > 0

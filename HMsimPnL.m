@@ -15,7 +15,7 @@ close(figure(1));close(figure(2))
 
 T = s0*9998/10000;
 
-rounds = 100;
+rounds = 1;
 
 X = 1; %this has to correspond to the paramenters in HMdynamicFD
 [~, ~,M]=HMdynamicFD(X, s0, gamma, kappa, c, F, R, G, b);
@@ -58,7 +58,7 @@ for i = 1:rounds
     % check at which index it hits boundary
     stopping_indx = HMstop(M, T1plot, X1plot);
     [~,I] = min(abs(T1plot-stopping_indx));
-    stopping_indx=I;
+    stopping_indx=I+5;
     if p == 1
         plot(T1plot(1:stopping_indx), X1plot(1:stopping_indx));
     end
